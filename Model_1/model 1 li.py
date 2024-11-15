@@ -43,8 +43,8 @@ x, y, z = solution.y[0], solution.y[1], solution.y[2]
 # Plot the results
 plt.figure(figsize=(8, 6))
 plt.plot(t_eval, z, label="z(t)")  # Plot the vertical position (z) over time
-plt.xlabel("Time (t)")
-plt.ylabel("Position")
+plt.xlabel("Time (t) [s]")
+plt.ylabel("Position [m]")
 plt.legend()
 plt.title("Cat Position vs. Time")
 plt.grid()
