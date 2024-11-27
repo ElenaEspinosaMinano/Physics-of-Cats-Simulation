@@ -8,8 +8,9 @@ from scipy.integrate import solve_ivp
 
 ### Parameters
 g = 9.81 # acceleration due to gravity (in m/s^2)
-R = 0.25 # radius of cat (in meters)
-m = 5 # mass of cat (in kg)
+R = 0.20 # radius of cat (in meters)
+m = 3 # mass of cat (in kg)
+gamma = 100000000000
 
 # Define equations
 # d(theta)/dt = theta_dot
@@ -20,7 +21,7 @@ def f(t, y, param):
     theta_dot = y[1] # angular velocity
 
     dtheta_dt = theta_dot
-    dtheta_dot_dt = -g / R * np.sin(theta)
+    dtheta_dot_dt = -g / R * np.sin(theta) - gamma * theta_dot
     
     return np.array([dtheta_dt, dtheta_dot_dt])
 
@@ -37,20 +38,17 @@ def euler(t_array, f, y0):
         dt = t_array[i+1] - t_array[i] # time step
         Y[i+1,:] = Y[i,:] + f(t_array[i], Y[i,:], param) * dt
 
-        # z1[idx+1] = z1[idx] + dt*z2[idx]
-        # z2[idx+1] = z2[idx] + dt*f(t, z1[idx], z2[idx])
-
     return Y
 
 ### Initial conditions
 theta_0 = 0 # initial angle (in radians)
-theta_dot_0 = 0.1 # initial angular velocity (in radians/s)
+theta_dot_0 = 0.2 # initial angular velocity (in radians/s)
 
 y0 = np.array([theta_0, theta_dot_0])
 
 t0 = 0.0
 tf = 10.0
-h = 0.2
+h = 0.01
 N = (tf - t0) / h
 
 t_array = np.linspace(t0, tf, int(N + 1))  # time array

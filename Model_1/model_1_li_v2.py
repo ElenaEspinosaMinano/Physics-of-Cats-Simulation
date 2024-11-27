@@ -9,14 +9,14 @@ k = 1  # Elastic constant of the potential field to simulate agility
 R = 0.3  # Radius of equilibrium position (cat's typical movement range)
 gamma = 5  # Damping coefficient to reduce oscillations, simulating quick reactions
 
-lam = 100000000  # Large value to simulate a rigid constraint
+lam = 500000  # Large value to simulate a rigid constraint
 
 # Define the gradient of the potential field (i.e., -∇V)
 def grad_V(x, y, z):
     return np.array([
-        k * x,        # Partial derivative of V with respect to x -  + 4*lam*(x)**3
-        k * y,        # Partial derivative of V with respect to y
-        m * g * z + 4*lam*(z)**3 # Partial derivative of V with respect to z
+        x,        # Partial derivative of V with respect to x -  + 4*lam*(x)**3
+        y,        # Partial derivative of V with respect to y
+        m * g * z + 4*lam*(z**2 - R**2) # Partial derivative of V with respect to z -  
     ])
 
 # Define the system of ODEs
