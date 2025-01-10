@@ -59,8 +59,8 @@ z = R * np.cos(theta)
 
 ### Plot the results
 plt.figure()
-plt.plot(t_array, theta, label='theta (angle)')
-plt.plot(t_array, theta_dot, label='theta_dot (angular velocity)')
+# plt.plot(t_array, theta, label='theta (angle)')
+# plt.plot(t_array, theta_dot, label='theta_dot (angular velocity)')
 plt.plot(t_array, z, label='z (height)')
 plt.xlabel('Time, t (in seconds)')
 plt.ylabel('Height, z (in meters)')
