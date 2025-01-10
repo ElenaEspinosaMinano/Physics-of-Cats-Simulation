@@ -1,10 +1,10 @@
-# Script for model 2 of the falling cat - Peano's model (Naf)
+# @author: syedanafisaabdulanis
 
 import numpy as np
 import matplotlib.pyplot as plt
 
 class PeanoModel:
-    def __init__(self, segments=2, inertia=None, mass=5.0, gravity=9.81, lever_arm=0.1, initial_height=10.0):
+    def __init__(self, segments=2, inertia=None, mass=5.0, gravity=9.81, lever_arm=0.1, initial_height=10.0, max_angle=np.pi/4):
         self.segments = segments  # Number of body segments (e.g., front and back)
         self.segment_angles = np.zeros(segments, dtype=float)  # Angles of each segment
         self.segment_angular_velocities = np.zeros(segments, dtype=float)  # Angular velocities of each segment
@@ -14,6 +14,7 @@ class PeanoModel:
         self.lever_arm = lever_arm  # Distance to the center of mass (m)
         self.height = initial_height  # Initial height (m)
         self.vertical_velocity = 0.0  # Initial vertical velocity (m/s)
+        self.max_angle = max_angle  # Maximum allowable twist angle (radians)
 
     def compute_torque(self, angle):
         """
@@ -45,6 +46,15 @@ class PeanoModel:
         # Update angles based on corrected angular velocities
         self.segment_angles += self.segment_angular_velocities * delta_time
 
+        # Apply the maximum angle constraint
+        for i in range(self.segments):
+            if self.segment_angles[i] > self.max_angle:
+                self.segment_angles[i] = self.max_angle
+                self.segment_angular_velocities[i] = 0  # Stop further rotation
+            elif self.segment_angles[i] < -self.max_angle:
+                self.segment_angles[i] = -self.max_angle
+                self.segment_angular_velocities[i] = 0  # Stop further rotation
+
     def update_height(self, delta_time):
         """
         Update the vertical position of the cat.
@@ -67,13 +77,15 @@ inertia = [1, 1]  # Equal moments of inertia for simplicity
 mass = 5.0  # Average mass of a cat (kg)
 gravitational_acceleration = 9.81  # Gravity (m/s^2)
 lever_arm = 0.1  # Distance to the center of mass (m)
-initial_height = 100 # Initial height (m)
+initial_height = 100  # Initial height (m)
 initial_angular_velocities = [1, -1]  # Initial velocities ensuring zero total angular momentum
-simulation_time = 100 # Maximum simulation time in seconds
+simulation_time = 10  # Maximum simulation time in seconds
 delta_time = 0.01  # Time step
+max_angle = np.pi / 4  # Maximum twist angle (45 degrees)
 
 def run_simulation():
-    peano_model = PeanoModel(segments=segments, inertia=inertia, mass=mass, gravity=gravitational_acceleration, lever_arm=lever_arm, initial_height=initial_height)
+    peano_model = PeanoModel(segments=segments, inertia=inertia, mass=mass, gravity=gravitational_acceleration,
+                             lever_arm=lever_arm, initial_height=initial_height, max_angle=max_angle)
     peano_model.segment_angular_velocities = np.array(initial_angular_velocities, dtype=float)
 
     times = [0]
@@ -108,10 +120,11 @@ def run_simulation():
     plt.figure(figsize=(8, 6))
     for segment in range(segments):
         plt.plot(times[:-1], segment_angles_over_time[:, segment], label=f"Segment {segment + 1} Angle")
-    plt.axhline(y=0, color='k', linestyle='--', label="Zero Rotation")
+    plt.axhline(y=max_angle, color='r', linestyle='--', label="Max Angle (45°)")
+    plt.axhline(y=-max_angle, color='r', linestyle='--')
     plt.xlabel("Time (s)")
     plt.ylabel("Segment Angles (Radians)")
-    plt.title("Peano Model Simulation: Angles During Fall")
+    plt.title("Peano Model Simulation: Angles During Fall with Max Angle Constraint")
     plt.legend()
     plt.grid()
     plt.show()
