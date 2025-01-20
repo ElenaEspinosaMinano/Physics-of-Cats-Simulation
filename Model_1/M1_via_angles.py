@@ -7,7 +7,7 @@ from scipy.integrate import solve_ivp
 
 ### Parameters
 g = 9.81 # acceleration due to gravity (in m/s^2)
-R = 0.2 # radius of cat (in meters)
+R = 0.1 # radius of cat (in meters)
 m = 3 # mass of cat (in kg)
 gamma = 2
 
