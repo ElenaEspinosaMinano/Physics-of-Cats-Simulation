@@ -4,6 +4,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
+from matplotlib.ticker import MultipleLocator, FuncFormatter
+
+### Default color cycle of matplotlib
+colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+fontsize=14
+fontsize_title=18
+fontsize_axes=14
+fontsize_tick=fontsize
+fontsizeSmall=14
+fontsizeTiny=12
 
 ### Parameters
 g = 9.81 # acceleration due to gravity (in m/s^2)
@@ -39,9 +49,9 @@ N = (tf - t0) / h
 t_array = np.linspace(t0, tf, int(N))  # time array
 param = [g, R]  # parameters: g and R
 
-### Solve using BDF method
+### Solve using RK45 method
 print(f"Solving DE with [theta, theta_dot] = [{theta_0} rad, {theta_dot_0} rad/s], [t0, tf] = [{t0}, {tf}], step size = {h}, no of steps = {N} ")
-solution = solve_ivp(fun=f, t_span=[t0, tf], y0=[theta_0, theta_dot_0], method='BDF', t_eval=t_array)
+solution = solve_ivp(fun=f, t_span=[t0, tf], y0=[theta_0, theta_dot_0], method='RK45', t_eval=t_array)
 
 # solution = euler(t_array, f, y0_array) # euler method doesn't work
 
@@ -58,14 +68,51 @@ print(theta_dot[-1])
 z = R * np.cos(theta)
 
 ### Plot the results
-plt.figure()
-# plt.plot(t_array, theta, label='theta (angle)')
-# plt.plot(t_array, theta_dot, label='theta_dot (angular velocity)')
-plt.plot(t_array, z, label='z (height)')
-plt.xlabel('Time, t (in seconds)')
-plt.ylabel('Height, z (in meters)')
-plt.legend()
+fig, axs = plt.subplots(3, 1, figsize=(8, 12), sharex=True)
+
+# Height vs. time
+axs[0].plot(t_array, z, label='Height (z)', color=colors[0])
+axs[0].set_ylabel('Height, z\n (in meters)', fontsize=fontsize_axes)
+axs[0].legend(fontsize=fontsizeTiny)
+axs[0].grid(True, alpha=0.5)
+axs[0].tick_params(axis='both', labelsize=fontsize_tick)
+
+# Theta vs. time
+axs[1].plot(t_array, theta, label='Angle (θ)', color=colors[1])
+axs[1].set_ylabel('Angle, θ\n (in radians)', fontsize=fontsize_axes)
+axs[1].legend(fontsize=fontsizeTiny)
+axs[1].grid(True, alpha=0.5)
+axs[1].tick_params(axis='both', labelsize=fontsize_tick)
+
+### y-axis of theta plot as multiples of π
+def pi_formatter(x, pos):
+    return f"{x/np.pi:.0g}π" if x != 0 else "0"
+
+axs[1].yaxis.set_major_locator(MultipleLocator(base=np.pi/2))
+axs[1].yaxis.set_minor_locator(MultipleLocator(base=np.pi/4))
+axs[1].yaxis.set_major_formatter(FuncFormatter(pi_formatter))
+
+# Angular velocity vs. time
+axs[2].plot(t_array, theta_dot, label='Angular Velocity (ω)', color=colors[2])
+axs[2].set_xlabel('Time, t (in seconds)', fontsize=fontsize_axes)
+axs[2].set_ylabel('Angular Velocity, ω\n (in radians/second)', fontsize=fontsize_axes)
+axs[2].legend(fontsize=fontsizeTiny)
+axs[2].grid(True, alpha=0.5)
+axs[2].tick_params(axis='both', labelsize=fontsize_tick)
+
+plt.tight_layout()
+plt.savefig('../../Figures/'+'M1_via_angles_graphs.png', dpi=300, bbox_inches='tight')
 plt.show()
+
+### Plot the results
+# plt.figure()
+# # plt.plot(t_array, theta, label='theta (angle)')
+# # plt.plot(t_array, theta_dot, label='theta_dot (angular velocity)')
+# plt.plot(t_array, z, label='z (height)')
+# plt.xlabel('Time, t (in seconds)')
+# plt.ylabel('Height, z (in meters)')
+# plt.legend()
+# plt.show()
 
 
 """
