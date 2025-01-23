@@ -24,14 +24,14 @@ k = 1 # some sort of spring constant between the cylinders
 
 gamma = 2 # assume gamma_1 = gamma_2 = gamma = 2 -> damping coefficient??
 
-gamma_1 = 2
-gamma_2 = 2
+gamma_1 = 0.2
+gamma_2 = 0.2
 
-tau_1 = 1 # internal torque of cylinder 1 (from cat!)
-tau_2 = -1 # internal torque of cylinder 2 (from cat!)
+tau_1 = 0.5 # internal torque of cylinder 1 (from cat!)
+tau_2 = -0.5 # internal torque of cylinder 2 (from cat!)
 
-I_1 = 1 # moment of inertia of cylinder 1
-I_2 = 1 # moment of inertia of cylinder 2
+I_1 = 1/2*m*R**2 # moment of inertia of cylinder 1
+I_2 = 1/2*m*R**2 # moment of inertia of cylinder 2
 
 # Define equations
 # d(theta_1)/dt = v_1
@@ -70,6 +70,7 @@ def Runge_Kutta_4(times, f, y0):
         delta3 = f(times[i] + 0.5 * dt, Y[i,:] + 0.5 * delta2) * dt
         delta4 = f( times[i] + dt,Y[i,:] + delta3) * dt
 
+        # update Y using RK4 method
         Y[i+1,:] = Y[i,:] + (delta1 + 2.0 * delta2 + 2.0 * delta3 + delta4)/6.
     
     return Y
@@ -92,7 +93,7 @@ t_array = np.linspace(t0, tf, int(N))  # time array
 
 ### Solve using RK45 method
 # print(f"Solving DE with [theta, theta_dot] = [{theta_0} rad, {theta_dot_0} rad/s], [t0, tf] = [{t0}, {tf}], step size = {h}, no of steps = {N} ")
-solution = solve_ivp(fun=f, t_span=[t0, tf], y0=[theta_1_0, v_1_0, theta_2_0, v_2_0], method='RK45', t_eval=t_array)
+# solution = solve_ivp(fun=f, t_span=[t0, tf], y0=[theta_1_0, v_1_0, theta_2_0, v_2_0], method='RK45', t_eval=t_array)
 
 ### Get theta and v from the solution - using scipy.solve_ivp
 # theta_1 = solution.y[0]
@@ -110,14 +111,16 @@ v_2 = Y[:,3]
 
 ### Should now calculate z_1 and z_2 and then get the average (ie. the z_CoM)
 
-### Plot the results
+### plot results
 fig, axs = plt.subplots(1, 2, figsize=(16, 6))
 
-# Theta vs. time
+### theta vs time
 axs[0].plot(t_array, theta_1, label=r'$\theta_1$', alpha=0.7, color=colors[0])
 axs[0].plot(t_array, theta_2, label=r'$\theta_2$', alpha=0.7, color=colors[1])
 axs[0].set_xlabel('Time (s)', fontsize=fontsize_axes)
-axs[0].set_ylabel('Angle, $\theta$\n(in radians)', fontsize=fontsize_axes)
+axs[0].set_xlim([0, 10])
+axs[0].set_ylabel('Angle, $\\theta$\n(in radians)', fontsize=fontsize_axes)
+axs[0].set_ylim([-np.pi/2, np.pi/2])
 axs[0].legend(fontsize=fontsizeSmall)
 axs[0].grid(True, alpha=0.5)
 axs[0].tick_params(axis='both', labelsize=fontsize_tick)
@@ -130,7 +133,7 @@ axs[0].yaxis.set_major_locator(MultipleLocator(base=np.pi/2))
 axs[0].yaxis.set_minor_locator(MultipleLocator(base=np.pi/4))
 axs[0].yaxis.set_major_formatter(FuncFormatter(pi_formatter))
 
-# Angular velocity vs. time
+### angular velocity vs time
 axs[1].plot(t_array, v_1, label=r'$v_1$', alpha=0.7, color=colors[2])
 axs[1].plot(t_array, v_2, label=r'$v_2$', alpha=0.7, color=colors[3])
 axs[1].set_xlabel('Time (s)', fontsize=fontsize_axes)
@@ -143,20 +146,22 @@ plt.tight_layout()
 # plt.savefig('../../Figures/'+'Side_by_side_angles_and_velocities.png', dpi=300, bbox_inches='tight')
 plt.show()
 
-# plt.plot(t_array, theta_1, label=r'$\theta_1$', alpha=0.7)
-# plt.plot(t_array, theta_2, label=r'$\theta_2$', alpha=0.7)
-# plt.xlabel('Time (s)', fontsize=fontsize)
-# plt.ylabel('Angle (rad)', fontsize=fontsize)
-# plt.legend(fontsize=fontsize)
-# plt.grid(True, alpha=0.5)
-# plt.tick_params(axis='both', labelsize=fontsize_tick)
-# plt.show()
 
-# plt.plot(t_array, v_1, label=r'$v_1$', alpha=0.7)
-# plt.plot(t_array, v_2, label=r'$v_2$', alpha=0.7)
-# plt.xlabel('Time (s)', fontsize=fontsize)
-# plt.ylabel('Angular velocity (rad/s)', fontsize=fontsize)
-# plt.legend(fontsize=fontsize)
-# plt.grid(True, alpha=0.5)
-# plt.tick_params(axis='both', labelsize=fontsize_tick)
-# plt.show()
+### alternative way to plot
+plt.plot(t_array, theta_1, label=r'$\theta_1$', alpha=0.7)
+plt.plot(t_array, theta_2, label=r'$\theta_2$', alpha=0.7)
+plt.xlabel('Time (s)', fontsize=fontsize)
+plt.ylabel('Angle (rad)', fontsize=fontsize)
+plt.legend(fontsize=fontsize)
+plt.grid(True, alpha=0.5)
+plt.tick_params(axis='both', labelsize=fontsize_tick)
+plt.show()
+
+plt.plot(t_array, v_1, label=r'$v_1$', alpha=0.7)
+plt.plot(t_array, v_2, label=r'$v_2$', alpha=0.7)
+plt.xlabel('Time (s)', fontsize=fontsize)
+plt.ylabel('Angular velocity (rad/s)', fontsize=fontsize)
+plt.legend(fontsize=fontsize)
+plt.grid(True, alpha=0.5)
+plt.tick_params(axis='both', labelsize=fontsize_tick)
+plt.show()
