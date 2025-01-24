@@ -22,15 +22,13 @@ m = 3 # mass of cat (in kg)
 
 k = 1 # some sort of spring constant between the cylinders
 
-gamma = 2 # assume gamma_1 = gamma_2 = gamma = 2 -> damping coefficient??
-
-gamma_1 = 0.2
-gamma_2 = 0.2
+gamma_1 = 0.1 # damping coefficient
+gamma_2 = 0.1
 
 tau_1 = 0.5 # internal torque of cylinder 1 (from cat!)
 tau_2 = -0.5 # internal torque of cylinder 2 (from cat!)
 
-I_1 = 1/2*m*R**2 # moment of inertia of cylinder 1
+I_1 = 1/2*m*R**2 # moment of inertia of cylinder 1 - 0.015
 I_2 = 1/2*m*R**2 # moment of inertia of cylinder 2
 
 # Define equations
@@ -85,7 +83,7 @@ v_2_0 = 0.2 # initial angular velocity (in radians/s)
 # y0_array = np.array([theta_1_0, v_1_0, theta_2_0, v_2_0])
 
 t0 = 0.0
-tf = 10.0
+tf = 3.0
 h = 0.001
 N = (tf - t0) / h
 
@@ -109,7 +107,18 @@ v_1 = Y[:,1]
 theta_2 = Y[:,2]
 v_2 = Y[:,3]
 
+### find where the angular velocity are close to zero (ie. cross the x-axis)
+v_1_cross = np.where(v_1 < 0.001)[0][0]
+v_2_cross = np.where(v_2 < 0.001)[0][0]
+
+t_cross = t_array[v_1_cross]
+print(t_cross)
+print(v_1_cross)
+
 ### Should now calculate z_1 and z_2 and then get the average (ie. the z_CoM)
+z_1 = R * np.cos(theta_1)
+z_2 = R * np.cos(theta_2)
+z_CoM = 0.5 * (z_1 + z_2)
 
 ### plot results
 fig, axs = plt.subplots(1, 2, figsize=(16, 6))
@@ -118,7 +127,7 @@ fig, axs = plt.subplots(1, 2, figsize=(16, 6))
 axs[0].plot(t_array, theta_1, label=r'$\theta_1$', alpha=0.7, color=colors[0])
 axs[0].plot(t_array, theta_2, label=r'$\theta_2$', alpha=0.7, color=colors[1])
 axs[0].set_xlabel('Time (s)', fontsize=fontsize_axes)
-axs[0].set_xlim([0, 10])
+axs[0].set_xlim([0, 3])
 axs[0].set_ylabel('Angle, $\\theta$\n(in radians)', fontsize=fontsize_axes)
 axs[0].set_ylim([-np.pi/2, np.pi/2])
 axs[0].legend(fontsize=fontsizeSmall)
@@ -134,8 +143,9 @@ axs[0].yaxis.set_minor_locator(MultipleLocator(base=np.pi/4))
 axs[0].yaxis.set_major_formatter(FuncFormatter(pi_formatter))
 
 ### angular velocity vs time
-axs[1].plot(t_array, v_1, label=r'$v_1$', alpha=0.7, color=colors[2])
-axs[1].plot(t_array, v_2, label=r'$v_2$', alpha=0.7, color=colors[3])
+axs[1].plot(t_array, v_1, label=r'$\omega_1$', alpha=0.7, color=colors[2])
+axs[1].plot(t_array, v_2, label=r'$\omega_2$', alpha=0.7, color=colors[3])
+axs[1].plot(t_cross, v_1[v_1_cross], 'kx', label=r't = {:.3f}s'.format(t_cross))
 axs[1].set_xlabel('Time (s)', fontsize=fontsize_axes)
 axs[1].set_ylabel('Angular Velocity, $\omega$\n(in radians/second)', fontsize=fontsize_axes)
 axs[1].legend(fontsize=fontsizeSmall)
@@ -146,10 +156,10 @@ plt.tight_layout()
 # plt.savefig('../../Figures/'+'Side_by_side_angles_and_velocities.png', dpi=300, bbox_inches='tight')
 plt.show()
 
-
 ### alternative way to plot
 plt.plot(t_array, theta_1, label=r'$\theta_1$', alpha=0.7)
 plt.plot(t_array, theta_2, label=r'$\theta_2$', alpha=0.7)
+# plt.plot(t_array, z_CoM, label=r'$z_{CoM}$', alpha=0.7)
 plt.xlabel('Time (s)', fontsize=fontsize)
 plt.ylabel('Angle (rad)', fontsize=fontsize)
 plt.legend(fontsize=fontsize)
@@ -157,11 +167,30 @@ plt.grid(True, alpha=0.5)
 plt.tick_params(axis='both', labelsize=fontsize_tick)
 plt.show()
 
-plt.plot(t_array, v_1, label=r'$v_1$', alpha=0.7)
-plt.plot(t_array, v_2, label=r'$v_2$', alpha=0.7)
+plt.plot(t_array, v_1, label=r'$\omega_1$', alpha=0.7)
+plt.plot(t_array, v_2, label=r'$\omega_2$', alpha=0.7)
+plt.plot(t_cross, v_1[v_1_cross], 'kx', label=r't = {:.3f}s'.format(t_cross))
 plt.xlabel('Time (s)', fontsize=fontsize)
 plt.ylabel('Angular velocity (rad/s)', fontsize=fontsize)
 plt.legend(fontsize=fontsize)
 plt.grid(True, alpha=0.5)
 plt.tick_params(axis='both', labelsize=fontsize_tick)
 plt.show()
+
+
+### Calculate the total energy of the system
+K1 = 0.5 * I_1 * v_1**2                        # Kinetic energy of cylinder 1
+K2 = 0.5 * I_2 * v_2**2                        # Kinetic energy of cylinder 2
+U_spring = 0.5 * k * (theta_1 - theta_2)**2    # Spring potential energy
+Energy = K1 + K2 + U_spring                    # Total energy of the system
+
+### plot the total energy of the system
+# plt.figure(figsize=(10, 6))
+# plt.plot(t_array, Energy, label='Total Energy', color='green', alpha=0.7)
+# plt.xlabel('Time (s)', fontsize=14)
+# plt.ylabel('Energy (J)', fontsize=14)
+# plt.xlim(0,3)
+# plt.title('Energy vs. Time', fontsize=16)
+# plt.grid(alpha=0.5)
+# plt.legend(fontsize=12)
+# plt.show()
