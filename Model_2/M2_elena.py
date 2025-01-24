@@ -120,64 +120,6 @@ z_1 = R * np.cos(theta_1)
 z_2 = R * np.cos(theta_2)
 z_CoM = 0.5 * (z_1 + z_2)
 
-### plot results
-fig, axs = plt.subplots(1, 2, figsize=(16, 6))
-
-### theta vs time
-axs[0].plot(t_array, theta_1, label=r'$\theta_1$', alpha=0.7, color=colors[0])
-axs[0].plot(t_array, theta_2, label=r'$\theta_2$', alpha=0.7, color=colors[1])
-axs[0].set_xlabel('Time (s)', fontsize=fontsize_axes)
-axs[0].set_xlim([0, 3])
-axs[0].set_ylabel('Angle, $\\theta$\n(in radians)', fontsize=fontsize_axes)
-axs[0].set_ylim([-np.pi/2, np.pi/2])
-axs[0].legend(fontsize=fontsizeSmall)
-axs[0].grid(True, alpha=0.5)
-axs[0].tick_params(axis='both', labelsize=fontsize_tick)
-
-### y-axis of theta plot as multiples of π
-def pi_formatter(x, pos):
-    return f"{x/np.pi:.0g}π" if x != 0 else "0"
-
-axs[0].yaxis.set_major_locator(MultipleLocator(base=np.pi/2))
-axs[0].yaxis.set_minor_locator(MultipleLocator(base=np.pi/4))
-axs[0].yaxis.set_major_formatter(FuncFormatter(pi_formatter))
-
-### angular velocity vs time
-axs[1].plot(t_array, v_1, label=r'$\omega_1$', alpha=0.7, color=colors[2])
-axs[1].plot(t_array, v_2, label=r'$\omega_2$', alpha=0.7, color=colors[3])
-axs[1].plot(t_cross, v_1[v_1_cross], 'kx', label=r't = {:.3f}s'.format(t_cross))
-axs[1].set_xlabel('Time (s)', fontsize=fontsize_axes)
-axs[1].set_ylabel('Angular Velocity, $\omega$\n(in radians/second)', fontsize=fontsize_axes)
-axs[1].legend(fontsize=fontsizeSmall)
-axs[1].grid(True, alpha=0.5)
-axs[1].tick_params(axis='both', labelsize=fontsize_tick)
-
-plt.tight_layout()
-# plt.savefig('../../Figures/'+'Side_by_side_angles_and_velocities.png', dpi=300, bbox_inches='tight')
-plt.show()
-
-### alternative way to plot
-plt.plot(t_array, theta_1, label=r'$\theta_1$', alpha=0.7)
-plt.plot(t_array, theta_2, label=r'$\theta_2$', alpha=0.7)
-# plt.plot(t_array, z_CoM, label=r'$z_{CoM}$', alpha=0.7)
-plt.xlabel('Time (s)', fontsize=fontsize)
-plt.ylabel('Angle (rad)', fontsize=fontsize)
-plt.legend(fontsize=fontsize)
-plt.grid(True, alpha=0.5)
-plt.tick_params(axis='both', labelsize=fontsize_tick)
-plt.show()
-
-plt.plot(t_array, v_1, label=r'$\omega_1$', alpha=0.7)
-plt.plot(t_array, v_2, label=r'$\omega_2$', alpha=0.7)
-plt.plot(t_cross, v_1[v_1_cross], 'kx', label=r't = {:.3f}s'.format(t_cross))
-plt.xlabel('Time (s)', fontsize=fontsize)
-plt.ylabel('Angular velocity (rad/s)', fontsize=fontsize)
-plt.legend(fontsize=fontsize)
-plt.grid(True, alpha=0.5)
-plt.tick_params(axis='both', labelsize=fontsize_tick)
-plt.show()
-
-
 ### Calculate the total energy of the system
 K1 = 0.5 * I_1 * v_1**2                        # Kinetic energy of cylinder 1
 K2 = 0.5 * I_2 * v_2**2                        # Kinetic energy of cylinder 2
@@ -193,4 +135,70 @@ Energy = K1 + K2 + U_spring                    # Total energy of the system
 # plt.title('Energy vs. Time', fontsize=16)
 # plt.grid(alpha=0.5)
 # plt.legend(fontsize=12)
+# plt.show()
+
+### plot results
+fig, axs = plt.subplots(3, 1, figsize=(8, 12))
+
+### theta vs time
+axs[0].plot(t_array, theta_1, label=r'$\theta_1$', alpha=0.7, color=colors[0])
+axs[0].plot(t_array, theta_2, label=r'$\theta_2$', alpha=0.7, color=colors[1])
+# axs[0].set_xlabel('Time (s)', fontsize=fontsize_axes)
+axs[0].set_xlim([0, 3])
+axs[0].set_ylim([-0.75, 0.75])
+axs[0].set_ylabel('Angle, $\\theta$ (rad)', fontsize=fontsize_axes)
+# axs[0].set_ylim([-np.pi/2, np.pi/2])
+axs[0].legend(fontsize=fontsizeSmall)
+axs[0].grid(True, alpha=0.5)
+axs[0].tick_params(axis='both', labelsize=fontsize_tick)
+
+# ### y-axis of theta plot as multiples of π
+# def pi_formatter(x, pos):
+#     return f"{x/np.pi:.0g}π" if x != 0 else "0"
+
+# axs[0].yaxis.set_major_locator(MultipleLocator(base=np.pi/2))
+# axs[0].yaxis.set_minor_locator(MultipleLocator(base=np.pi/4))
+# axs[0].yaxis.set_major_formatter(FuncFormatter(pi_formatter))
+
+### angular velocity vs time
+axs[1].plot(t_array, v_1, label=r'$\omega_1$', alpha=0.7, color=colors[2])
+axs[1].plot(t_array, v_2, label=r'$\omega_2$', alpha=0.7, color=colors[3])
+axs[1].plot(t_cross, v_1[v_1_cross], 'kx', label=r't = {:.3f}s'.format(t_cross))
+# axs[1].set_xlabel('Time (s)', fontsize=fontsize_axes)
+axs[1].set_ylabel('Angular Velocity, $\omega$\n(rad/s)', fontsize=fontsize_axes)
+axs[1].legend(fontsize=fontsizeSmall)
+axs[1].grid(True, alpha=0.5)
+axs[1].tick_params(axis='both', labelsize=fontsize_tick)
+
+axs[2].plot(t_array, Energy, label='Total Energy', alpha=0.7, color='black')
+axs[2].set_xlabel('Time (s)', fontsize=fontsize_axes)
+axs[2].set_ylabel('Total Energy (J)', fontsize=fontsize_axes)
+# axs[2].xlim(0,3)
+axs[2].legend(fontsize=fontsizeSmall)
+axs[2].grid(True, alpha=0.5)
+axs[2].tick_params(axis='both', labelsize=fontsize_tick)
+
+plt.tight_layout()
+plt.savefig('../../Figures/'+'M2_plots.png', dpi=300, bbox_inches='tight')
+plt.show()
+
+### alternative way to plot
+# plt.plot(t_array, theta_1, label=r'$\theta_1$', alpha=0.7)
+# plt.plot(t_array, theta_2, label=r'$\theta_2$', alpha=0.7)
+# # plt.plot(t_array, z_CoM, label=r'$z_{CoM}$', alpha=0.7)
+# plt.xlabel('Time (s)', fontsize=fontsize)
+# plt.ylabel('Angle (rad)', fontsize=fontsize)
+# plt.legend(fontsize=fontsize)
+# plt.grid(True, alpha=0.5)
+# plt.tick_params(axis='both', labelsize=fontsize_tick)
+# plt.show()
+
+# plt.plot(t_array, v_1, label=r'$\omega_1$', alpha=0.7)
+# plt.plot(t_array, v_2, label=r'$\omega_2$', alpha=0.7)
+# plt.plot(t_cross, v_1[v_1_cross], 'kx', label=r't = {:.3f}s'.format(t_cross))
+# plt.xlabel('Time (s)', fontsize=fontsize)
+# plt.ylabel('Angular velocity (rad/s)', fontsize=fontsize)
+# plt.legend(fontsize=fontsize)
+# plt.grid(True, alpha=0.5)
+# plt.tick_params(axis='both', labelsize=fontsize_tick)
 # plt.show()
